@@ -1,0 +1,42 @@
+# Author: Dou Yi-Ming
+# ID: 51902191036
+.pos    0x0
+init:  
+    irmovl  stack, %esp
+    call    main
+    halt
+
+    .align  4
+ele1:  
+    .long   0x00a
+    .long   ele2
+ele2:  
+    .long   0x0b0
+    .long   ele3
+ele3:   
+    .long   0xc00
+    .long   0
+
+main:   
+    irmovl  ele1,   %edi        # move the head addr of the list to %edi
+    irmovl  $4,     %esi        # set %esi = const int 4
+    call    rsumFunc
+    ret
+    
+rsumFunc:                       # return value save in %eax, ptr save in %edi
+    andl    %edi,   %edi        #   if(%edi == 0)
+    je      rsumFuncEnd         #       return 0
+    pushl   %edi,               #   push %edi to stack
+    mrmovl  4(%edi),    %edi    #   %edi = %edi -> next
+    call    rsumFunc            #
+    popl    %edi                #   fetch data = memory[%ecx]
+    mrmovl  0(%edi), %ebp
+    addl    %ebp,   %eax        #   %eax += data
+    ret
+    
+rsumFuncEnd:                    # return 0
+    irmovl  $0,     %eax        # set return value = 0
+    ret                         # return
+
+    .pos    0x200
+stack:

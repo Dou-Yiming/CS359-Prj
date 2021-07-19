@@ -1,0 +1,50 @@
+# Author: Dou Yi-Ming
+# ID: 519021910366
+.pos    0x0
+init:  
+    irmovl  stack, %esp
+    call    main
+    halt
+
+    .align  4
+src:
+    .long 0x00a
+    .long 0x0b0
+    .long 0xc00
+
+dest:
+    .long 0x111
+    .long 0x222
+    .long 0x333
+# eax: return value
+# ebx: src
+# ecx: dst
+# edx: len
+
+# esp: stack
+main:   
+    irmovl  src,    %ebx        # move src addr to %ebx
+    irmovl  dest,   %ecx        # move dst addr to %ecx
+    irmovl  $3,     %edx        # set len = 3
+    irmovl  $4,     %esi        # set %esi = 4
+    irmovl  $1,     %ebp        # set %ebp = 1
+    irmovl  $0,     %eax        # set return value = 0
+    call    copyFunc
+    ret
+    
+copyFunc:                       # return value save in %eax
+    andl    %edx,   %edx        #   if(%edx == 0)
+    je      copyFuncEnd         #       return 0
+    mrmovl  0(%ebx),    %edi    #   %edi = [%ebx]
+    addl    %esi,   %ebx        #   %ebx += 4
+    rmmovl  %edi,   0(%ecx)     #   [%ecx] = %edi
+    addl    %esi,   %ecx        #   %ecx += 4
+    xorl    %edi,   %eax        #   %eax ^= %edi
+    subl    %ebp,   %edx        #   %edx -= 1   
+    jmp     copyFunc            
+
+copyFuncEnd:
+    ret                         # return
+
+    .pos    0x200
+stack:

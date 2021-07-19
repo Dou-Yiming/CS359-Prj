@@ -1,0 +1,38 @@
+# Author: Dou Yi-Ming
+# ID: 51902191036
+.pos    0x0
+init:  
+    irmovl  stack, %esp
+    call    main
+    halt
+
+    .align  4
+ele1:  
+    .long   0x00a
+    .long   ele2
+ele2:  
+    .long   0x0b0
+    .long   ele3
+ele3:   
+    .long   0xc00
+    .long   0
+
+main:   
+    irmovl  ele1,   %edi        # move the head addr of the list to %edi
+    irmovl  $0,     %eax        # %rax store the sum of list, 0 init
+    call    sumFunc
+    ret
+    
+sumFunc:
+    andl    %edi,   %edi        # while(%edi != 0){
+    je      sumFuncEnd          #       else return
+    mrmovl  0(%edi),    %ebp    #       move data from memory[0+%edi] to %ebp
+    addl    %ebp,    %eax       #       %eax += data
+    mrmovl  4(%edi),    %edi    #       %edi = %edi -> next
+    jmp     sumFunc             # }
+
+sumFuncEnd:
+    ret                         # return
+
+    .pos    0x200
+stack:
